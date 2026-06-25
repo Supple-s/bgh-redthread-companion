@@ -1,0 +1,17 @@
+# Local open-weight reranker fallback (mxbai-rerank-large-v2 via mxbai-rerank).
+# Lets the companion server rerank retrieval candidates WITHOUT a Voyage API key.
+# Heavy: the mxbai-rerank-v2 model is Qwen2.5-based (~1.5B params). Enable at
+# runtime with LOCAL_RERANK_ENABLED=true.
+#
+# Multilingual by design (do-no-harm): an English-only cross-encoder would demote
+# the language-supporting (e.g. Korean) chunk. mxbai-rerank-v2 covers 100+ langs.
+#
+# IMPORTANT: like the local embed deps, install the CPU torch build first for
+# distribution (the default CUDA wheel is multi-GB and useless on buyers' machines):
+#   pip install torch --index-url https://download.pytorch.org/whl/cpu
+#   pip install -r requirements-local-rerank.txt
+#
+# torch + transformers are shared with requirements-local-embed.txt; the
+# transformers <5 pin there also applies here (mxbai loads via the same stack).
+-r requirements-local-embed.txt
+mxbai-rerank>=0.1.6

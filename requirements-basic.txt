@@ -1,0 +1,7 @@
+Flask>=3.0,<4
+flask-cors>=5.0,<7
+waitress>=3.0,<4
+python-dotenv>=1.0,<2
+requests>=2.32,<3
+google-auth>=2.35,<3
+chromadb>=1,<2

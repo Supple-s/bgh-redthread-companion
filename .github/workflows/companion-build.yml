@@ -1,0 +1,92 @@
+name: Build companion server
+
+# Freezes the Python companion server into a standalone, no-Python-required
+# Windows bundle using PyInstaller (companion-server.spec).
+#
+# Distribution is Windows-only and UNSIGNED by GM decision (2026-06-14):
+# macOS/Linux bundles and code signing / notarization were declined.
+# Triggered manually, or by pushing a tag like `companion-v1.0.0`.
+#
+# Output: the zipped Windows bundle, uploaded as a build artifact (and attached
+# to a GitHub Release when triggered by a tag). Unsigned -> Windows users click
+# SmartScreen "More info -> Run anyway" on first launch.
+
+on:
+  workflow_dispatch: {}
+  push:
+    tags:
+      - 'companion-v*'
+
+jobs:
+  build:
+    name: build-${{ matrix.label }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            label: windows-x64
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-basic.txt
+          pip install "pyinstaller>=6,<7"
+          # Local embedding edition (decision "a"): bundle CPU torch + the model so
+          # the frozen server embeds offline without a Voyage API key. The CPU index
+          # is mandatory — the default CUDA wheel is multi-GB and useless on buyers' PCs.
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install -r requirements-local-embed.txt
+          # Local reranker edition: mxbai-rerank (shares the torch/transformers stack
+          # above, so this only adds the inference wrapper + a couple of small deps).
+          pip install -r requirements-local-rerank.txt
+          # STT edition (GM 2026-06-24): faster-whisper + its CTranslate2/PyAV native
+          # runtime, so PyInstaller can collect them into the bundle. The Whisper CT2
+          # model itself is fetched in the next step for offline bundling.
+          pip install -r requirements-stt.txt
+
+      - name: Fetch local models (embedding + reranker + STT Whisper, for offline bundling)
+        run: python fetch_local_model.py
+
+      - name: Build frozen bundle
+        run: pyinstaller --noconfirm --clean companion-server.spec
+
+      # Code signing / notarization were evaluated and DECLINED (GM, 2026-06-14).
+      # The Windows bundle ships unsigned by design; first launch shows a SmartScreen
+      # "More info -> Run anyway" prompt. No signing step here on purpose.
+
+      # Place exe-side helper scripts in the bundle ROOT (next to the exe), not in
+      # _internal where PyInstaller 6 onedir puts spec `datas`. reset.bat clears state;
+      # the Quick Tunnel launchers expose Foundry(30000)+STT(5000) over HTTPS for remote
+      # players (require cloudflared, which the .ps1 prompts to winget-install).
+      - name: Bundle helper scripts (reset + Quick Tunnel launchers)
+        shell: pwsh
+        run: Copy-Item reset.bat, start-voice-tunnels.bat, start-voice-tunnels.ps1 dist/companion-server/
+
+      - name: Package bundle (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Compress-Archive -Path dist/companion-server/* `
+            -DestinationPath "dist/companion-server-${{ matrix.label }}.zip"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: companion-server-${{ matrix.label }}
+          path: dist/companion-server-${{ matrix.label }}.zip
+          if-no-files-found: error
+
+      - name: Attach to release
+        if: startsWith(github.ref, 'refs/tags/companion-v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/companion-server-${{ matrix.label }}.zip

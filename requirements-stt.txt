@@ -1,0 +1,2 @@
+-r requirements-basic.txt
+faster-whisper>=1.1,<2

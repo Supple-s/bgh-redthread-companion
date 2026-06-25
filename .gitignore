@@ -1,0 +1,24 @@
+.env
+llm_proxy_keys.json
+companion_auth.json
+data/
+chroma_db/
+world_graph.json
+*.sqlite3
+*.pem
+*.key
+*credential*.json
+service-account*.json
+client_secret*.json
+__pycache__/
+.venv/
+venv/
+
+# PyInstaller frozen-build artifacts (companion-server.spec is tracked; outputs are not)
+build/
+dist/
+*.manifest
+
+# Pre-downloaded local embedding model snapshot (fetch_local_model.py, multi-GB,
+# bundled at build time — never committed)
+models/

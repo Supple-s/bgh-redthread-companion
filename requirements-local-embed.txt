@@ -1,0 +1,21 @@
+# Local open-weight embedding fallback (voyage-4-nano via sentence-transformers).
+# Lets the companion server embed WITHOUT a Voyage API key. Heavy: pulls torch +
+# transformers. Enable at runtime with LOCAL_EMBEDDING_ENABLED=true.
+#
+# IMPORTANT: install the CPU torch build for distribution - the default CUDA wheel
+# is multi-GB and useless on buyers' machines. The CI freeze build and setup.ps1
+# -WithLocalEmbed install torch from the CPU index explicitly BEFORE this file:
+#   pip install torch --index-url https://download.pytorch.org/whl/cpu
+#   pip install -r requirements-local-embed.txt
+#
+# Version window VERIFIED 2026-06-14 (torch 2.12.0+cpu / sentence-transformers 5.5.1
+# / transformers 4.57.6): nano loads offline from the bundled snapshot, embeds 1024-d,
+# ko/en retrieval is sane, coexists with chromadb's tokenizers.
+#   - sentence-transformers >=5: provides the encode_query()/encode_document() methods.
+#   - transformers: voyage-4-nano's trust_remote_code code needs >=4.56.2 (it imports
+#     transformers.masking_utils and uses use_bidirectional_attention). transformers
+#     5.x BREAKS it - create_causal_mask renamed its `input_embeds` kwarg to
+#     `inputs_embeds`. So pin <5; do NOT let it float to 5.x.
+-r requirements-basic.txt
+sentence-transformers>=5,<6
+transformers>=4.56.2,<5

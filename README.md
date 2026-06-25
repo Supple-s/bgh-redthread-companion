@@ -83,23 +83,6 @@ Then open:
 http://127.0.0.1:5000/health
 ```
 
-## Optional authentication (a password for the server)
-
-This is a **password you choose** for the companion server — not a provider API key. It
-protects RAG, Memory, Graph, STT, and proxy routes. Under the hood it is the
-`COMPANION_API_KEY` value; set the same password on both sides.
-
-**Easiest — set it in Foundry, no `.env` editing.** In **Settings Hub → API / Connections →
-Companion server password**, type a password and click **Apply to server**. The first time
-(when none is set yet) is accepted without prior auth and persisted next to the executable
-(`companion_auth.json`); from then on the server requires that password.
-
-**Or via `.env`** (source installs / scripted setups): set `COMPANION_API_KEY` in `.env` and
-the same value in the Foundry field above. An `.env` value always wins and the hub cannot
-change it.
-
-`/health` remains public so the module can diagnose connectivity without exposing secrets.
-
 ## Optional STT
 
 Install the STT dependencies only if you need local transcription:
@@ -146,8 +129,6 @@ The Foundry model base URL can then point to:
 http://127.0.0.1:5000/v1beta/openai
 ```
 
-Use `COMPANION_API_KEY` as the API key in Foundry when companion authentication is enabled.
-
 ## Optional LLM proxy mode (keep provider keys server-side)
 
 By default the module is BYOK: it sends your LLM provider API key directly from the
@@ -162,8 +143,7 @@ This is distinct from the Vertex proxy above: Vertex uses Google ADC and only re
 In **Control Center → Settings Hub → API / Connections → Proxy mode keys**, type a
 provider's API key and click **Save to server**. The key is sent to this companion
 server and stored next to the executable (`llm_proxy_keys.json`) — never in your Foundry
-world — and survives restarts. Then enable the **Proxy mode** toggle. (Tip: also set
-`COMPANION_API_KEY` so only your authenticated module can write keys.)
+world — and survives restarts. Then enable the **Proxy mode** toggle.
 
 The `.env` route below is equivalent and still supported (useful for source installs or
 scripted setups); environment variables take precedence over keys entered in the hub.

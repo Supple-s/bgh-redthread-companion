@@ -59,12 +59,12 @@ if ($WithStt) {
         Write-Host "[setup] FAILED: requirements-stt.txt install returned $LASTEXITCODE" -ForegroundColor Red
         exit 1
     }
-    Write-Host "[setup] STT 의존성 설치 완료. faster-whisper가 PyAV 동봉 디코더를 쓰므로 시스템 ffmpeg 설치는 필요 없습니다." -ForegroundColor Yellow
+    Write-Host "[setup] STT 의존성 설치 완료 / STT deps installed. faster-whisper가 PyAV 동봉 디코더를 쓰므로 시스템 ffmpeg 설치는 필요 없습니다 / faster-whisper uses PyAV's bundled decoder, so no system ffmpeg is needed." -ForegroundColor Yellow
 }
 
 # 6. 로컬 임베딩 의존성 (옵션) — Voyage 키 없이 임베딩. CPU torch를 끌어오므로 무겁다.
 if ($WithLocalEmbed) {
-    Write-Host "[setup] Installing CPU torch (배포용: CUDA 휠은 수 GB라 회피)..." -ForegroundColor Cyan
+    Write-Host "[setup] Installing CPU torch (배포용: CUDA 휠은 수 GB라 회피 / for distribution: the CUDA wheel is multi-GB, avoided)..." -ForegroundColor Cyan
     pip install torch --index-url https://download.pytorch.org/whl/cpu
     if ($LASTEXITCODE -ne 0) {
         Write-Host "[setup] FAILED: CPU torch install returned $LASTEXITCODE" -ForegroundColor Red
@@ -76,9 +76,9 @@ if ($WithLocalEmbed) {
         Write-Host "[setup] FAILED: requirements-local-embed.txt install returned $LASTEXITCODE" -ForegroundColor Red
         exit 1
     }
-    Write-Host "[setup] 로컬 임베딩 의존성 설치 완료. .env에 LOCAL_EMBEDDING_ENABLED=true 로 켜세요." -ForegroundColor Yellow
+    Write-Host "[setup] 로컬 임베딩 의존성 설치 완료 / local embedding deps installed. .env에 LOCAL_EMBEDDING_ENABLED=true 로 켜세요 / enable with LOCAL_EMBEDDING_ENABLED=true in .env." -ForegroundColor Yellow
 }
 
 Write-Host ""
 Write-Host "[setup] DONE." -ForegroundColor Green
-Write-Host "[setup] 이제 .\start.ps1 또는 .\start.ps1 -WithStt 로 서버를 시작할 수 있습니다." -ForegroundColor Green
+Write-Host "[setup] 이제 .\start.ps1 또는 .\start.ps1 -WithStt 로 서버를 시작할 수 있습니다 / now start the server with .\start.ps1 or .\start.ps1 -WithStt." -ForegroundColor Green

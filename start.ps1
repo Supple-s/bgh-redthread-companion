@@ -23,7 +23,7 @@ Write-Host "[start] Working dir: $scriptDir" -ForegroundColor Cyan
 
 # 1. venv 존재 확인
 if (-not (Test-Path ".\.venv\Scripts\Activate.ps1")) {
-    Write-Host "[start] FAILED: .venv가 없습니다. 먼저 .\setup.ps1 을 실행하세요." -ForegroundColor Red
+    Write-Host "[start] FAILED: .venv가 없습니다 / .venv not found. 먼저 .\setup.ps1 을 실행하세요 / run .\setup.ps1 first." -ForegroundColor Red
     exit 1
 }
 
@@ -34,7 +34,7 @@ Write-Host "[start] Activating .venv..." -ForegroundColor Cyan
 # 3. flask 설치 확인 (basic 의존성 sanity check)
 python -c "import flask" 2>$null
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "[start] FAILED: flask가 설치돼 있지 않습니다. .\setup.ps1 을 실행하세요." -ForegroundColor Red
+    Write-Host "[start] FAILED: flask가 설치돼 있지 않습니다 / flask is not installed. .\setup.ps1 을 실행하세요 / run .\setup.ps1." -ForegroundColor Red
     exit 1
 }
 
@@ -42,20 +42,20 @@ if ($LASTEXITCODE -ne 0) {
 if ($WithStt) {
     python -c "import faster_whisper" 2>$null
     if ($LASTEXITCODE -ne 0) {
-        Write-Host "[start] FAILED: STT 모드인데 faster_whisper가 없습니다. .\setup.ps1 -WithStt 를 실행하세요." -ForegroundColor Red
+        Write-Host "[start] FAILED: STT 모드인데 faster_whisper가 없습니다 / STT mode but faster_whisper is missing. .\setup.ps1 -WithStt 를 실행하세요 / run .\setup.ps1 -WithStt." -ForegroundColor Red
         exit 1
     }
-    Write-Host "[start] STT 모드 활성. .env의 STT_ENABLED=true 인지 확인하세요." -ForegroundColor Yellow
+    Write-Host "[start] STT 모드 활성 / STT mode on. .env의 STT_ENABLED=true 인지 확인하세요 / check STT_ENABLED=true in .env." -ForegroundColor Yellow
 }
 
 # 4b. 로컬 임베딩 사용 시 의존성 확인
 if ($WithLocalEmbed) {
     python -c "import sentence_transformers" 2>$null
     if ($LASTEXITCODE -ne 0) {
-        Write-Host "[start] FAILED: 로컬 임베딩 모드인데 sentence-transformers가 없습니다. .\setup.ps1 -WithLocalEmbed 를 실행하세요." -ForegroundColor Red
+        Write-Host "[start] FAILED: 로컬 임베딩 모드인데 sentence-transformers가 없습니다 / local embedding mode but sentence-transformers is missing. .\setup.ps1 -WithLocalEmbed 를 실행하세요 / run .\setup.ps1 -WithLocalEmbed." -ForegroundColor Red
         exit 1
     }
-    Write-Host "[start] 로컬 임베딩 모드 활성. .env의 LOCAL_EMBEDDING_ENABLED=true 인지 확인하세요." -ForegroundColor Yellow
+    Write-Host "[start] 로컬 임베딩 모드 활성 / local embedding mode on. .env의 LOCAL_EMBEDDING_ENABLED=true 인지 확인하세요 / check LOCAL_EMBEDDING_ENABLED=true in .env." -ForegroundColor Yellow
 }
 
 # 5. 서버 시작

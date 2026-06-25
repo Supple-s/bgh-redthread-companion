@@ -16,7 +16,7 @@ Write-Host "[start-stt] Working dir: $scriptDir" -ForegroundColor Cyan
 
 # 1. venv 존재 확인
 if (-not (Test-Path ".\.venv\Scripts\Activate.ps1")) {
-    Write-Host "[start-stt] FAILED: .venv가 없습니다. 먼저 .\setup.ps1 -WithStt 를 실행하세요." -ForegroundColor Red
+    Write-Host "[start-stt] FAILED: .venv가 없습니다 / .venv not found. 먼저 .\setup.ps1 -WithStt 를 실행하세요 / run .\setup.ps1 -WithStt first." -ForegroundColor Red
     exit 1
 }
 
@@ -27,18 +27,18 @@ Write-Host "[start-stt] Activating .venv..." -ForegroundColor Cyan
 # 3. flask 설치 확인
 python -c "import flask" 2>$null
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "[start-stt] FAILED: flask가 설치돼 있지 않습니다. .\setup.ps1 -WithStt 를 실행하세요." -ForegroundColor Red
+    Write-Host "[start-stt] FAILED: flask가 설치돼 있지 않습니다 / flask is not installed. .\setup.ps1 -WithStt 를 실행하세요 / run .\setup.ps1 -WithStt." -ForegroundColor Red
     exit 1
 }
 
 # 4. STT 의존성 확인 (faster_whisper)
 python -c "import faster_whisper" 2>$null
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "[start-stt] FAILED: faster_whisper가 설치돼 있지 않습니다. .\setup.ps1 -WithStt 를 실행하세요." -ForegroundColor Red
+    Write-Host "[start-stt] FAILED: faster_whisper가 설치돼 있지 않습니다 / faster_whisper is not installed. .\setup.ps1 -WithStt 를 실행하세요 / run .\setup.ps1 -WithStt." -ForegroundColor Red
     exit 1
 }
 
-Write-Host "[start-stt] STT 모드 활성. .env의 STT_ENABLED=true 인지 확인하세요." -ForegroundColor Yellow
+Write-Host "[start-stt] STT 모드 활성 / STT mode on. .env의 STT_ENABLED=true 인지 확인하세요 / check STT_ENABLED=true in .env." -ForegroundColor Yellow
 
 # 5. 서버 시작
 Write-Host ""
